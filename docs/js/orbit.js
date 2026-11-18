@@ -72,8 +72,9 @@
       color = mix(color, vec3(0.85, 0.95, 0.58), outline * 0.76);
 
       float edge = 1.0 - smoothstep(1.0 - 1.0 / frame.z, 1.0 + 1.0 / frame.z, radial);
-      float halo = (1.0 - edge) * exp(-max(0.0, radial - 1.0) * 128.0) * (1.0 - zoom.x);
-      gl_FragColor = vec4(mix(color, vec3(0.47, 0.68, 0.57), 1.0 - edge), max(edge, 0.5 * halo));
+      float halo = (1.0 - edge) * exp(-max(0.0, radial - 1.0) * 128.0)
+        * (1.0 - zoom.x) * 0.25;
+      gl_FragColor = vec4(color * edge + vec3(0.47, 0.68, 0.57) * halo, edge + halo);
     }
   `;
 
@@ -138,7 +139,7 @@
   }
 
   function makeRenderer(onReady) {
-    const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: false, powerPreference: 'low-power' });
+    const gl = canvas.getContext('webgl', { premultipliedAlpha: true, antialias: false, powerPreference: 'low-power' });
     if (!gl) return null;
     const program = gl.createProgram();
     const sources = [[gl.VERTEX_SHADER, vertexSource], [gl.FRAGMENT_SHADER, fragmentSource]];
